@@ -1,0 +1,52 @@
+#!/bin/bash
+#SBATCH --mail-user=mary.chalkley@vanderbilt.edu
+#SBATCH --mail-type=END
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=32G
+#SBATCH --time=08:00:00
+#SBATCH --output=DMRHMRintersect_%A.out
+#SBATCH --error=DMRHMRintersect_%A.err
+#SBATCH --job-name="DMRHMRintersect"
+
+
+module restore methpipe_tools
+
+HMR=/data/ihrie_lab/9593_data/results/merged
+DMR=/data/ihrie_lab/9593_data/results/merged/DMR/filtered
+OUT=/data/ihrie_lab/9593_data/results/merged/intersect
+
+# Intersect HMR and DMR regions
+bedtools intersect -a "${HMR}/TSP77WT_merge_d10_cov5_HMR.roimeth" -b "${DMR}/TSP77mergeNPC_WT_lt_LOF_DMR.filtered" > "${OUT}/TSP77WT_lt_LOF_DMR_WT_HMR_NPC_intersected_regions.bed"
+
+bedtools intersect -a "${HMR}/TSP77WT_merge_d10_cov5_HMR.roimeth" -b "${DMR}/TSP77mergeNPC_WT_lt_HET_DMR.filtered" > "${OUT}/TSP77WT_lt_HET_DMR_WT_HMR_NPC_intersected_regions.bed"
+
+
+bedtools intersect -a "${HMR}/TSP77Het_merge_d10_cov5_HMR.roimeth" -b "${DMR}/TSP77mergeNPC_HET_lt_LOF_DMR.filtered" > "${OUT}/TSP77HET_lt_LOF_DMR_HET_HMR_NPC_intersected_regions.bed"
+
+bedtools intersect -a "${HMR}/TSP77Het_merge_d10_cov5_HMR.roimeth" -b "${DMR}/TSP77mergeNPC_HET_lt_WT_DMR.filtered" > "${OUT}/TSP77HET_lt_WT_DMR_HET_HMR_NPC_intersected_regions.bed"
+
+
+bedtools intersect -a "${HMR}/TSP77LOF_merge_d10_cov5_HMR.roimeth" -b "${DMR}/TSP77mergeNPC_LOF_lt_WT_DMR.filtered" > "${OUT}/TSP77LOF_lt_WT_DMR_LOF_HMR_NPC_intersected_regions.bed"
+
+bedtools intersect -a "${HMR}/TSP77LOF_merge_d10_cov5_HMR.roimeth" -b "${DMR}/TSP77mergeNPC_LOF_lt_HET_DMR.filtered" > "${OUT}/TSP77LOF_lt_HET_DMR_LOF_HMR_NPC_intersected_regions.bed"
+
+
+
+bedtools intersect -a "${HMR}/TSP77WT_merge_iPSC_cov5_HMR.roimeth" -b "${DMR}/TSP77mergeiPSC_WT_lt_LOF_DMR.filtered" > "${OUT}/TSP77WT_lt_LOF_DMR_WT_HMR_iPSC_intersected_regions.bed"
+
+bedtools intersect -a "${HMR}/TSP77WT_merge_iPSC_cov5_HMR.roimeth" -b "${DMR}/TSP77mergeiPSC_WT_lt_HET_DMR.filtered" > "${OUT}/TSP77WT_lt_HET_DMR_WT_HMR_iPSC_intersected_regions.bed"
+
+
+bedtools intersect -a "${HMR}/TSP77Het_merge_iPSC_cov5_HMR.roimeth" -b "${DMR}/TSP77mergeiPSC_HET_lt_LOF_DMR.filtered" > "${OUT}/TSP77HET_lt_LOF_DMR_HET_HMR_iPSC_intersected_regions.bed"
+
+bedtools intersect -a "${HMR}/TSP77Het_merge_iPSC_cov5_HMR.roimeth" -b "${DMR}/TSP77mergeiPSC_HET_lt_WT_DMR.filtered" > "${OUT}/TSP77HET_lt_WT_DMR_HET_HMR_iPSC_intersected_regions.bed"
+
+
+bedtools intersect -a "${HMR}/TSP77LOF_merge_iPSC_cov5_HMR.roimeth" -b "${DMR}/TSP77mergeiPSC_LOF_lt_WT_DMR.filtered" > "${OUT}/TSP77LOF_lt_WT_DMR_LOF_HMR_iPSC_intersected_regions.bed"
+
+bedtools intersect -a "${HMR}/TSP77LOF_merge_iPSC_cov5_HMR.roimeth" -b "${DMR}/TSP77mergeiPSC_LOF_lt_HET_DMR.filtered" > "${OUT}/TSP77LOF_lt_HET_DMR_LOF_HMR_iPSC_intersected_regions.bed"
+
+
+echo "intersect complete"

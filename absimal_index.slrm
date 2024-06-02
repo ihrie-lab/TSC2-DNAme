@@ -1,0 +1,15 @@
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --time=24:00:00
+#SBATCH --mem=128G
+#SBATCH --job-name="walt"
+#SBATCH --mail-user=mary.chalkley@vanderbilt.edu
+#SBATCH --mail-type=END
+#SBATCH -o mapping_%A.out # Standard output
+#SBATCH -e mapping_%A.err # Standard error
+
+module restore methpipe_tools
+
+abismalidx /data/ihrie_lab/9593_data/hg38A_genome/hg38.fa /data/ihrie_lab/9593_data/hg38A_genome/absimal_hg38.index

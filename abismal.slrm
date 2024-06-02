@@ -1,0 +1,35 @@
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=12
+#SBATCH --time=48:00:00
+#SBATCH --mem=128G
+#SBATCH --job-name="abismal"
+#SBATCH --mail-user=mary.chalkley@vanderbilt.edu
+#SBATCH --mail-type=END
+#SBATCH -o abismal_%A.out # Standard output
+#SBATCH -e abismal_%A.err # Standard error
+
+#############################################
+# input variables:
+#   R1: Read-1 file, zipped
+#   R2: Read-2 file, zipped
+#   INDEX: genome index
+#   MAPPED_DIR: mapped reads directory
+#############################################
+
+module restore methpipe_tools
+
+# Sets up the prefix naming for output files
+MAPPED=`basename $R1 _val_1.fq`
+TRIMDIR=/data/ihrie_lab/9593_data/data/trimmed_reads
+echo "${MAPPED}"
+
+
+# Runs the abismal mapping algorithm for bisulfite sequencing libraries
+# Run accross 12 threads
+# Output is sam file type
+
+abismal -i ${INDEX} -o ${MAPPED_DIR}/${MAPPED}.sam -t 12 -s -v ${TRIMDIR}/${MAPPED}_val_1.fq ${TRIMDIR}/${MAPPED}_val_2.fq | samtools view -bS > ${MAPPED_DIR}/${MAPPED}.bam
+
+echo "mapping of ${MAPPED} complete"

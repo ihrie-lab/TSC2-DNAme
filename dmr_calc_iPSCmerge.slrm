@@ -1,0 +1,40 @@
+#!/bin/bash
+#SBATCH --mail-user=mary.chalkley@vanderbilt.edu
+#SBATCH --mail-type=END
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=32G
+#SBATCH --time=08:00:00
+#SBATCH --output=DMRiPSC_%A.out
+#SBATCH --error=DMRiPSC_%A.err
+#SBATCH --job-name="DMR"
+
+
+date
+
+#restore tools module to allow for methpipe packages to be run 
+module restore methpipe_tools
+
+echo ${file1}
+echo ${file2}
+echo ${file3}
+
+#create a methdiff file, needed for the DMR calculation for each comparison 
+methdiff ${IN}/${file1}.meth ${IN}/${file2}.meth -o ${DATA}/TSP77mergeiPSC_WT_HET.methdiff
+methdiff ${IN}/${file1}.meth ${IN}/${file3}.meth -o ${DATA}/TSP77mergeiPSC_WT_LOF.methdiff
+methdiff ${IN}/${file2}.meth ${IN}/${file3}.meth -o ${DATA}/TSP77mergeiPSC_HET_LOF.methdiff
+
+echo "methdiff complete"
+
+#run dmr command to find differentially methylated regions
+dmr ${DATA}/TSP77mergeiPSC_WT_HET.methdiff ${IN}/${file1}.hmr ${IN}/${file2}.hmr \
+	${OUT}/TSP77mergeiPSC_WT_lt_HET.dmr ${OUT}/TSP77mergeiPSC_HET_lt_WT.dmr 
+	
+dmr ${DATA}/TSP77mergeiPSC_WT_LOF.methdiff ${IN}/${file1}.hmr ${IN}/${file3}.hmr \
+	${OUT}/TSP77mergeiPSC_WT_lt_LOF.dmr ${OUT}/TSP77mergeiPSC_LOF_lt_WT.dmr 
+	
+dmr ${DATA}/TSP77mergeiPSC_HET_LOF.methdiff ${IN}/${file2}.hmr ${IN}/${file3}.hmr \
+	${OUT}/TSP77mergeiPSC_HET_lt_LOF.dmr ${OUT}/TSP77mergeiPSC_LOF_lt_HET.dmr 
+
+echo "DMR calculation complete"
