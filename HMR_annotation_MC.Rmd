@@ -1,0 +1,95 @@
+# Region Annotation
+
+### HMRs
+
+```{r warning=FALSE, echo=FALSE}
+library(tidyverse)
+library(egg)
+library(gghighlight)
+library(ggpubr)
+library(ChIPseeker)
+library(clusterProfiler)
+library(data.table)
+library(ReactomePA)
+library(enrichplot)
+library(DOSE)
+library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene
+
+setwd("/Users/marychalkley/Desktop/")
+
+HMRfiles <- list("wt_d10"="TSP77WT_merge_d10_cov5_HMR.roimeth","het_d10" = "TSP77Het_merge_d10_cov5_HMR.roimeth", "LOF_d10"="TSP77LOF_merge_d10_cov5_HMR.roimeth", "wt_ipsc" = "TSP77WT_merge_iPSC_cov5_HMR.roimeth", "het_ipsc" = "TSP77Het_merge_iPSC_cov5_HMR.roimeth", "LOF_ipsc" = "TSP77LOF_merge_iPSC_cov5_HMR.roimeth" )
+
+HMRpeakAnnoList <- lapply(HMRfiles, annotatePeak, TxDb=txdb,
+                       tssRegion=c(-2000, 500), verbose=FALSE,
+                                  assignGenomicAnnotation = TRUE,
+                                  genomicAnnotationPriority = c("Promoter", "5UTR", "3UTR", "Exon", "Intron", "Downstream", "Intergenic"),
+                                  annoDb="org.Hs.eg.db", addFlankGeneInfo = TRUE,
+                                  flankDistance = 10000, sameStrand = FALSE, ignoreOverlap = FALSE, 
+                                  ignoreUpstream = FALSE, ignoreDownstream = FALSE, 
+                                  overlap = "all")
+
+HMRpeakAnnotation <- plotAnnoBar(HMRpeakAnnoList)
+HMRpeakAnnotation
+
+HMRgenes = lapply(HMRpeakAnnoList, function(i) as.data.frame(i)$geneId)
+names(HMRgenes) = sub("_", "\n", names(HMRgenes))
+
+HMRcompGO <- compareCluster(geneCluster = HMRgenes,
+                                  fun = "enrichGO",
+                                  OrgDb="org.Hs.eg.db",
+                                  ont = "all",
+                                  pAdjustMethod = "BH",
+                                  qvalueCutoff  = 0.0001)
+
+HMRcompGO_df <- as.data.frame(HMRcompGO)
+
+wt_d10_GO <- filter(HMRcompGO_df, Cluster =="d10\nWTd10")
+het_d10_GO <- filter(HMRcompGO_df, Cluster =="d10\nHetd10")
+LOF_d10_GO <- filter(HMRcompGO_df, Cluster =="d10\nLOFd10")
+wt_ipsc_GO <- filter(HMRcompGO_df, Cluster =="ipsc\nWTiPSC")
+het_ipsc_GO <- filter(HMRcompGO_df, Cluster =="ipsc\nHetiPSC")
+LOF_ipsc_GO <- filter(HMRcompGO_df, Cluster =="ipsc\nLOFiPSC")
+
+HMRlistOfTables = list(wt_d10_GO, het_d10_GO, LOF_d10_GO, wt_ipsc_GO, het_ipsc_GO, LOF_ipsc_GO)
+HMRGreatGODotplot <- function(HMRlistOfTables, show=10, title = "GREAT GO Dotplot"){
+  ####### Table 1
+  # Create a main database table with IDs and percent fold change column
+  mainReferenceDBtemp <- rbindlist(HMRlistOfTables, idcol="cluster")
+  mainReferenceDBtemp$cluster <- factor(mainReferenceDBtemp$cluster, levels = unique(mainReferenceDBtemp$cluster))
+  # Next: Find out which rows to pull for graphing: 
+  # Take first X amount of lines from tables
+  loShortTables <- lapply(HMRlistOfTables, '[', c(1:show), )
+  # Find the list of Motifs to extract
+  shortTableDF <- rbindlist(loShortTables)
+  voTermsToExtract <- unique(shortTableDF$Description)
+  # Use the main database table to pulloutrows
+  tableToPlot <- mainReferenceDBtemp[mainReferenceDBtemp$Description %in% voTermsToExtract,]
+  tableToPlot$Description <- factor(tableToPlot$Description,levels=rev(unique(tableToPlot$Description)))
+  ###### Graph
+  maxPValue <- max(abs(tableToPlot$p.adjust))
+  medianPValue <- median(abs(tableToPlot$p.adjust))
+  minPValue <- min(abs(tableToPlot$p.adjust))
+  tableToPlot$max <- maxPValue
+  tableToPlot$median <- medianPValue
+  # Plot with GGPlot
+  dotplotGO <- ggplot(tableToPlot, aes(x=Cluster, y=Description)) + 
+    geom_point(aes(size = Count, color = p.adjust)) + 
+    scale_colour_gradient(limits=c(minPValue, maxPValue), low="#1F78B4", high="#B2DF8A") +
+    theme_bw() +
+    ggtitle(title) +
+    theme(axis.text.y=element_text(size=12)) +
+    theme(axis.text.x=element_text(size=12)) +
+    theme(axis.title.x = element_blank()) + 
+    theme(axis.title.y = element_blank()) + 
+    theme(legend.text=element_text(size=8, angle = 90, vjust = 0.5)) + 
+    theme(legend.title=element_text(size=8)) + 
+    theme(legend.position="bottom", legend.box = "vertical") +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+dotplotGO
+  }
+
+HMRplot <- HMRGreatGODotplot(HMRlistOfTables, show=20, title = "GREAT GO Dotplot")
+HMRplot
+```
+
