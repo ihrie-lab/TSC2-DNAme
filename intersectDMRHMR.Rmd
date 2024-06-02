@@ -1,0 +1,248 @@
+
+
+Annotate the intersected HMR DMR tsv
+```{r}
+library(data.table)
+library(ChIPseeker)
+library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+library(ggplot2)
+
+
+txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene
+
+
+# Load HMR file with annotated columns
+hmr_data <- fread("/Users/marychalkley/Dropbox (VU Basic Sciences)/Data/DNAmethylation/TSP77s iPSC + NPC WGBS n1&2 9593 Data/Results/DMR/filtered/TSP77LOF_lt_HET_DMR_LOF_HMR_intersect_NPC_matrix.tsv", 
+                  header = TRUE, 
+                  col.names = c("Chr", "Start", "End", "width", "strand"))
+
+# Create GRanges object for HMR regions
+hmr_gr <- GRanges(seqnames = hmr_data$Chr, 
+                  ranges = IRanges(start = hmr_data$Start, end = hmr_data$End))
+
+# Identify overlapping genes using ChIPseeker
+peakAnno <- annotatePeak(hmr_gr, 
+                         TxDb = txdb, 
+                         tssRegion = c(-2000, 500), 
+                         verbose = FALSE,
+                         assignGenomicAnnotation = TRUE,
+                         genomicAnnotationPriority = c("Promoter", "5UTR", "3UTR", "Exon", "Intron", "Downstream", "Intergenic"),
+                         flankDistance = 100000, 
+                         ignoreOverlap = FALSE)
+
+# Define the file path and name
+file_path <- "/Users/marychalkley/Dropbox (VU Basic Sciences)/Data/DNAmethylation/TSP77s iPSC + NPC WGBS n1&2 9593 Data/Results/DMR/intersect/"
+file_name <- "TSP77s_NPC_LOF_lt_HET_DMR_LOF_HMR_intersect_annotated.tsv"
+
+# Combine the file path and name
+file <- paste0(file_path, file_name)
+
+# Write the combined dataframe to a tab-delimited text file
+write.table(peakAnno, file = file, sep = "\t", quote = FALSE, row.names = FALSE)
+
+# Print a message confirming the file has been saved
+cat("File saved as:", file, "\n")
+```
+
+wt
+```{r}
+# Load required libraries
+library(data.table)
+
+
+setwd("/Users/marychalkley/VU Basic Sciences Dropbox/Mary Chalkley/Data/DNAmethylation/TSP77s iPSC + NPC WGBS n1&2 9593 Data/Results/cluster/")
+
+# Read HMR cluster regions file
+cluster3 <- fread("kmeans_HMR_cluster3.tsv", header = FALSE, col.names = c("chrom", "start", "end", "a", "b", "c", "d", "e", "f", "g"))
+
+#Print number of HMRs
+cluster3_hmrs <- nrow(cluster3)
+cat("total cluster HMRs:", cluster3_hmrs)
+
+setwd("/Users/marychalkley/VU Basic Sciences Dropbox/Mary Chalkley/Data/DNAmethylation/TSP77s iPSC + NPC WGBS n1&2 9593 Data/Results/DMR/intersect/")
+
+# Read the intersected regions file
+intersected_regions <- fread("TSP77WT_HMR_DMR_intersected_regions.bed", header = FALSE, col.names = c("chrom", "start", "end", "a", "b", "c", "d", "e", "f", "g"))
+
+# Calculate the total number of HMRs
+total_hmrs_wt <- nrow(intersected_regions)
+cat("total_hmrs:", total_hmrs_wt)
+
+# Calculate the number of unique HMRs (assuming each row represents one HMR)
+unique_hmrs <- length(unique(intersected_regions$chrom))
+cat("unique_hmrs:", unique_hmrs)
+
+# Calculate the percentage of HMRs that are also DMRs
+percentage_unique_hmrs_as_dmrs <- (unique_hmrs / total_hmrs_wt) * 100
+
+# Print the result
+cat("Percentage of HMRs that are also DMRs:", percentage_hmrs_as_dmrs, "%\n")
+
+percentage_cluster_hmrs_as_dmrs <- (total_hmrs_wt / cluster3_hmrs) * 100
+cat("percentage cluster hmrs as dmrs:", percentage_cluster_hmrs_as_dmrs, "%\n")
+
+```
+lof
+```{r}
+# Load required libraries
+library(data.table)
+
+setwd("/Users/marychalkley/VU Basic Sciences Dropbox/Mary Chalkley/Data/DNAmethylation/TSP77s iPSC + NPC WGBS n1&2 9593 Data/Results/cluster/")
+
+# Read HMR cluster regions file
+cluster2 <- fread("kmeans_HMR_cluster2.tsv", header = FALSE, col.names = c("chrom", "start", "end", "a", "b", "c", "d", "e", "f", "g"))
+
+#Print number of HMRs
+cluster2_hmrs <- nrow(cluster2)
+cat("total cluster HMRs:", cluster2_hmrs)
+
+setwd("/Users/marychalkley/VU Basic Sciences Dropbox/Mary Chalkley/Data/DNAmethylation/TSP77s iPSC + NPC WGBS n1&2 9593 Data/Results/DMR/intersect/")
+
+# Read the intersected regions file
+intersected_regions <- fread("TSP77LOF_HMR_DMR_intersected_regions.bed", header = FALSE, col.names = c("chrom", "start", "end", "a", "b", "c", "d", "e", "f", "g"))
+
+# Calculate the total number of HMRs
+total_hmrs_lof <- nrow(intersected_regions)
+cat("total_hmrs:", total_hmrs_lof)
+
+# Calculate the number of unique HMRs (assuming each row represents one HMR)
+unique_hmrs <- length(unique(intersected_regions$chrom))
+cat("unique_hmrs:", unique_hmrs)
+
+# Calculate the percentage of HMRs that are also DMRs
+percentage_unique_hmrs_as_dmrs <- (unique_hmrs / total_hmrs_lof) * 100
+
+# Print the result
+cat("Percentage of HMRs that are also DMRs:", percentage_hmrs_as_dmrs, "%\n")
+
+percentage_cluster_hmrs_as_dmrs <- (total_hmrs_lof / cluster2_hmrs) * 100
+cat("percentage cluster hmrs as dmrs:", percentage_cluster_hmrs_as_dmrs, "%\n")
+
+```
+ipscs
+```{r}
+# Load required libraries
+library(data.table)
+setwd("/Users/marychalkley/VU Basic Sciences Dropbox/Mary Chalkley/Data/DNAmethylation/TSP77s iPSC + NPC WGBS n1&2 9593 Data/Results/cluster/")
+
+# Read HMR cluster regions file
+cluster1 <- fread("kmeans_HMR_cluster1.tsv", header = FALSE, col.names = c("chrom", "start", "end", "a", "b", "c", "d", "e", "f", "g"))
+
+#Print number of HMRs
+cluster1_hmrs <- nrow(cluster1)
+cat("total cluster HMRs:", cluster1_hmrs)
+
+setwd("/Users/marychalkley/VU Basic Sciences Dropbox/Mary Chalkley/Data/DNAmethylation/TSP77s iPSC + NPC WGBS n1&2 9593 Data/Results/DMR/intersect/")
+
+# Read the intersected regions file
+intersected_regions <- fread("TSP77iPSC_HMR_DMR_intersected_regions.bed", header = FALSE, col.names = c("chrom", "start", "end", "a", "b", "c", "d", "e", "f", "g"))
+
+# Calculate the total number of HMRs
+total_hmrs_ipsc <- nrow(intersected_regions)
+cat("total_hmrs:", total_hmrs_ipsc)
+
+# Calculate the number of unique HMRs (assuming each row represents one HMR)
+unique_hmrs <- length(unique(intersected_regions$chrom))
+cat("unique_hmrs:", unique_hmrs)
+
+# Calculate the percentage of HMRs that are also DMRs
+percentage_unique_hmrs_as_dmrs <- (unique_hmrs / total_hmrs_ipsc) * 100
+
+# Print the result
+cat("Percentage of HMRs that are also DMRs:", percentage_hmrs_as_dmrs, "%\n")
+
+percentage_cluster_hmrs_as_dmrs <- (total_hmrs_ipsc / cluster1_hmrs) * 100
+cat("percentage cluster hmrs as dmrs:", percentage_cluster_hmrs_as_dmrs, "%\n")
+
+```
+npcs
+```{r}
+# Load required libraries
+library(ggplot2)
+library(data.table)
+
+# Set working directory to the location of HMR cluster regions file
+setwd("/Users/marychalkley/VU Basic Sciences Dropbox/Mary Chalkley/Data/DNAmethylation/TSP77s iPSC + NPC WGBS n1&2 9593 Data/Results/cluster/")
+
+# Read HMR cluster regions file
+cluster4 <- fread("kmeans_HMR_cluster4.tsv", header = FALSE, col.names = c("chrom", "start", "end", "a", "b", "c", "d", "e", "f", "g"))
+
+# Calculate the total number of cluster 4 HMRs
+cluster4_hmrs <- nrow(cluster4)
+cat("Total cluster 4 HMRs:", cluster4_hmrs)
+
+# Set working directory to the location of intersected regions file
+setwd("/Users/marychalkley/VU Basic Sciences Dropbox/Mary Chalkley/Data/DNAmethylation/TSP77s iPSC + NPC WGBS n1&2 9593 Data/Results/DMR/intersect/")
+
+# Read the intersected regions file
+intersected_regions <- fread("TSP77NPC_HMR_DMR_intersected_regions.bed", header = FALSE, col.names = c("chrom", "start", "end", "a", "b", "c", "d", "e", "f", "g"))
+
+# Calculate the total number of HMRs
+total_hmrs_npc <- nrow(intersected_regions)
+cat("Total HMRs:", total_hmrs_npc)
+
+# Calculate the number of unique HMRs (assuming each row represents one HMR)
+unique_hmrs <- length(unique(intersected_regions$chrom))
+cat("Unique HMRs:", unique_hmrs)
+
+# Calculate the percentage of HMRs that are also DMRs
+percentage_hmrs_as_dmrs <- (unique_hmrs / total_hmrs_npc) * 100
+cat("Percentage of HMRs that are also DMRs:", percentage_hmrs_as_dmrs, "%\n")
+
+# Calculate the percentage of cluster 4 HMRs that are also DMRs
+percentage_cluster_hmrs_as_dmrs <- (total_hmrs_npc / cluster4_hmrs) * 100
+cat("Percentage of cluster 4 HMRs that are also DMRs:", percentage_cluster_hmrs_as_dmrs, "%\n")
+```
+
+```{r}
+
+plot1 <- ggplot() +
+  geom_bar(mapping = aes(x = c("NPC HMRs"), 
+                         y = c(cluster4_hmrs, total_hmrs_npc), 
+                         fill = c("DMRs", "NPC HMRs")), 
+           stat = "identity", position = "stack") +
+  labs(x = "Cluster", y = "Total Number of HMRs") +
+  scale_fill_manual(values = c("DMRs" = "lightblue", "NPC HMRs" = "darkblue")) + # Adjust colors as needed
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) # Rotate x-axis labels
+
+ggsave("NPC_HMR_DMR.svg", plot1, width = 8, height = 6)
+
+plot2 <- ggplot() +
+  geom_bar(mapping = aes(x = c("iPSC HMRs"), 
+                         y = c(cluster1_hmrs, total_hmrs_ipsc), 
+                         fill = c("DMRs", "iPSC HMRs")), 
+           stat = "identity", position = "stack") +
+  labs(x = "Cluster", y = "Total Number of HMRs") +
+  scale_fill_manual(values = c("DMRs" = "lightblue", "iPSC HMRs" = "darkblue")) + # Adjust colors as needed
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) # Rotate x-axis labels
+
+ggsave("iPSC_HMR_DMR.svg", plot2, width = 8, height = 6)
+
+plot3 <- ggplot() +
+  geom_bar(mapping = aes(x = c("TSC2 +/+ HMRs"), 
+                         y = c(cluster3_hmrs, total_hmrs_wt), 
+                         fill = c("DMRs", "TSC2 +/+ HMRs")), 
+           stat = "identity", position = "stack") +
+  labs(x = "Cluster", y = "Total Number of HMRs") +
+  scale_fill_manual(values = c("DMRs" = "lightblue", "TSC2 +/+ HMRs" = "darkblue")) + # Adjust colors as needed
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) # Rotate x-axis labels
+
+ggsave("WT_HMR_DMR.svg", plot3, width = 8, height = 6)
+
+plot4 <- ggplot() +
+  geom_bar(mapping = aes(x = c("TSC2 LOF/LOF HMRs"), 
+                         y = c(cluster2_hmrs, total_hmrs_lof), 
+                         fill = c("DMRs", "TSC2 LOF/LOF HMRs")), 
+           stat = "identity", position = "stack") +
+  labs(x = "Cluster", y = "Total Number of HMRs") +
+  scale_fill_manual(values = c("DMRs" = "lightblue", "TSC2 LOF/LOF HMRs" = "darkblue")) + # Adjust colors as needed
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) # Rotate x-axis labels
+
+ggsave("LOF_HMR_DMR.svg", plot4, width = 8, height = 6)
+
+```
+
