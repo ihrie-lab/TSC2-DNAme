@@ -11,5 +11,5 @@ Once HMRs (Hypomethylated regions) have been called, the roimethstat.slrm script
 
 DMRs (differentially methylated regions) were then calculated using dmr_calc_iPSCmerge.slrm, dmr_calc_mergetime.slrm, dmr_calc_NPCmerge.slrm script depending on samples of interest.
 
-HMRs and DMRs were then intersected using the intersect.slrm script.
+HMRs and DMRs were then intersected using the intersect.slrm script. Intersected HMRs and DMRs are then processed by the intersectDMRHMR.Rmd script that annotates the intersected regions and gives percentage of HMRs that include DMRs.
 
