@@ -3,6 +3,7 @@
 This is the whole genome bisulfite sequencing workflow used in "Human TSC2 Mutant Cells Exhibit Aberrations in Early Neurodevelopment Accompanied by Changes in the DNA Methylome." by Chalkley et al. 2024
 
 After sequencing, intial pre-processing was performed. 
+
     1. Raw files were first trimmed using Trim-Galore in the trimming.slrm script
     2. Trimmed files were then mapped to hg38A genome using Abismal in the abismal.slrm script (run abismal_index.slrm first)
     3. Mapped files were then processed through Methpipe package from Smith Lab is the methprocess.slrm script
