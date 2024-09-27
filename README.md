@@ -1,6 +1,7 @@
 **Human TSC2 Mutant Cells Exhibit Aberrations in Early Neurodevelopment Accompanied by Changes in the DNA Methylome**
 --------------------------
-This is the whole genome bisulfite sequencing workflow used in "Human TSC2 Mutant Cells Exhibit Aberrations in Early Neurodevelopment Accompanied by Changes in the DNA Methylome." by Chalkley et al. 2024
+This is the whole genome bisulfite sequencing workflow used in "Human TSC2 Mutant Cells Exhibit Aberrations in Early Neurodevelopment Accompanied by Changes in the DNA Methylome." by Chalkley et al. 2024. Data sets can be accessed at GSE264590 and GSE269086.
+
 
 After sequencing, intial pre-processing was performed. 
 
