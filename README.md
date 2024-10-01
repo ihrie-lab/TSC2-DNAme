@@ -17,4 +17,4 @@ HMRs and DMRs were then intersected using the intersect.slrm script. Intersected
 
 HMRs were annotated using the HMR_annotation_MC.Rmd script.
 
-Microscopy images included in the study were quantified using 
+Microscopy images included in the study were quantified using B3Tub-Pax6_Analysis.ipynb
